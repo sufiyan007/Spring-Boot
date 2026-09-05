@@ -1,4 +1,4 @@
-Spring Boot Fundamentals 
+## Spring Boot Fundamentals 
 
 These notes cover the Spring Boot fundamentals learned after the Project Structure topic.
 

@@ -2280,8 +2280,10 @@ new
 
 ---
 
+-> Behind the scene when we click on run button:
 <img width="797" height="712" alt="image" src="https://github.com/user-attachments/assets/cb8c23b5-8939-48f5-82e5-d515f0a8a83d" />
 
+---
 
 > **One-line memory:**  
 > **Spring Boot starts the application → Spring manages Beans → **DI** wires them together → **Auto-Configuration** sets up infrastructure → startup callbacks run → the application becomes ready to serve requests.**

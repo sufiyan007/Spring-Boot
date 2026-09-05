@@ -149,7 +149,7 @@ A simplified view:
  PaymentService    EmailService    OrderService
      Bean              Bean             Bean
 
-The commonly used Spring container abstraction is the ApplicationContext.
+The commonly used Spring container abstraction is the **ApplicationContext**.
 
 For learning, think of:
 
@@ -286,7 +286,7 @@ Keep the main Spring Boot application class at the appropriate root package so y
 Remember:
 Component scanning finds candidate classes; Spring then registers/creates the corresponding Beans.
 
-🚀 6. @SpringBootApplication and Application Startup
+🚀 6. **@SpringBootApplication** and Application Startup
 
 A typical Spring Boot application starts like this:
 
@@ -298,7 +298,7 @@ public class DemoApplication {
     }
 }
 
-@SpringBootApplication is a convenience annotation that brings together major Spring Boot functionality. For learning purposes, remember it conceptually as:
+**@SpringBootApplication** is a convenience annotation that brings together major Spring Boot functionality. For learning purposes, remember it conceptually as:
 
 @Configuration
 +
@@ -571,7 +571,7 @@ If the class cannot work without PaymentService, the constructor shows that imme
 
 public OrderService(PaymentService paymentService)
 
-It also works naturally with final fields and makes unit testing straightforward because the test can provide the dependency directly.
+It also works naturally with **final** fields and makes unit testing straightforward because the test can provide the dependency directly.
 
 Good default pattern
 
@@ -581,7 +581,7 @@ public OrderService(PaymentService paymentService) {
     this.paymentService = paymentService;
 }
 
-🔒 12. private final — Why Do We Usually Use It?
+🔒 12. **private final** — Why Do We Usually Use It?
 
 In constructor injection, you will very often see:
 
@@ -593,7 +593,7 @@ private
 
 Only the class itself directly accesses the field.
 
-final
+**final**
 
 The field/reference cannot be reassigned after initialization.
 
@@ -607,9 +607,9 @@ After that, this is not allowed:
 
 this.paymentService = anotherPaymentService;
 
-because the field is final.
+because the field is **final**.
 
-Why is final a good fit for dependencies?
+Why is **final** a good fit for dependencies?
 
 Because a required dependency is usually part of the object's identity and should not suddenly be replaced after construction.
 
@@ -623,9 +623,9 @@ private final field
 
 This is why you see this pattern so often in professional Spring applications.
 
-When should I NOT use final?
+When should I NOT use **final**?
 
-Do not use final when you intentionally need the field to be reassigned.
+Do not use **final** when you intentionally need the field to be reassigned.
 
 Example:
 
@@ -643,7 +643,7 @@ PROCESSING
    ↓
 COMPLETED
 
-So final would not make sense.
+So **final** would not make sense.
 
 Important distinction
 
@@ -663,9 +663,9 @@ not:
 
 "The entire object is immutable."
 
-🪝 13. @Autowired — What It Actually Does
+🪝 13. **@Autowired** — What It Actually Does
 
-@Autowired identifies an injection point for Spring.
+**@Autowired** identifies an injection point for Spring.
 
 Example:
 
@@ -682,7 +682,7 @@ Constructor Injection
 @Autowired
     → explicitly marks WHERE Spring should inject
 
-Do we need @Autowired on a constructor?
+Do we need **@Autowired** on a constructor?
 
 If the class has only one constructor, usually no.
 
@@ -714,7 +714,7 @@ Why did your experiment show no difference?
 
 Because your class had one constructor. Spring already knows that this is the constructor it should use.
 
-When is @Autowired useful on a constructor?
+When is **@Autowired** useful on a constructor?
 
 When there are multiple constructors and you want to clearly identify the one Spring should use.
 
@@ -778,7 +778,7 @@ private PaymentService paymentService;
 
 Spring creates the object and then injects the field.
 
-It is supported and simple, but generally not the preferred default for required dependencies because the dependency is less explicit and the field cannot naturally be final.
+It is supported and simple, but generally not the preferred default for required dependencies because the dependency is less explicit and the field cannot naturally be **final**.
 
 Setter Injection
 
@@ -804,11 +804,11 @@ Optional/changeable dependency
 Field Injection
     → Supported, but generally avoid as your default
 
-🏷️ 15. @Component, @Service, @Repository, @Controller, @RestController
+🏷️ 15. **@Component**, **@Service**, **@Repository**, **@Controller**, **@RestController**
 
 These annotations help Spring identify classes that should participate in component management and communicate their responsibility.
 
-@Component
+**@Component**
 
 General-purpose Spring-managed component:
 
@@ -816,7 +816,7 @@ General-purpose Spring-managed component:
 public class PaymentService {
 }
 
-@Service
+**@Service**
 
 Commonly used for business/service logic:
 
@@ -824,7 +824,7 @@ Commonly used for business/service logic:
 public class OrderService {
 }
 
-@Repository
+**@Repository**
 
 Commonly used for persistence/database access:
 
@@ -832,11 +832,11 @@ Commonly used for persistence/database access:
 public class OrderRepository {
 }
 
-@Controller
+**@Controller**
 
 Used for traditional Spring MVC controllers.
 
-@RestController
+**@RestController**
 
 Used for REST APIs:
 
@@ -861,13 +861,13 @@ A useful way to think about them:
 @RestController
     → REST API controller
 
-🌐 16. @RestController — Your Earlier Doubt
+🌐 16. **@RestController** — Your Earlier Doubt
 
 You asked:
 
-"Why are we writing @RestController when I am not calling through an endpoint?"
+"Why are we writing **@RestController** when I am not calling through an endpoint?"
 
-The answer is that @RestController does two conceptual things:
+The answer is that **@RestController** does two conceptual things:
 
 1. Makes the class a Spring-managed component
 2. Gives it REST controller semantics
@@ -924,9 +924,9 @@ Started ✅
 Tomcat running ✅
 No endpoint called yet ✅
 
-🛠️ 17. Manual Bean Creation — @Configuration + @Bean
+🛠️ 17. Manual Bean Creation — **@Configuration** + **@Bean**
 
-Sometimes you want Spring to manage an object, but you don't want or cannot put @Component on the class.
+Sometimes you want Spring to manage an object, but you don't want or cannot put **@Component** on the class.
 
 Example:
 
@@ -976,19 +976,19 @@ Spring Container
         ↓
 managed Bean
 
-Why do we need @Configuration?
+Why do we need **@Configuration**?
 
-@Configuration tells Spring:
+**@Configuration** tells Spring:
 
 "This class contains configuration instructions."
 
 A common use is to define Beans.
 
-🆚 18. @Component vs @Bean
+🆚 18. **@Component** vs **@Bean**
 
 These solve the same broad problem—getting an object into the Spring Container—but they are used differently.
 
-@Component
+**@Component**
 
 Put it directly on the class:
 
@@ -1000,7 +1000,7 @@ Think:
 
 "Spring, discover this class and manage it."
 
-@Bean
+**@Bean**
 
 Put it on a method inside configuration:
 
@@ -1019,7 +1019,7 @@ Think:
 
 When should I use which?
 
-Use @Component / @Service when:
+Use **@Component** / **@Service** when:
 
 You control the class
 +
@@ -1027,7 +1027,7 @@ it naturally belongs as a Spring-managed application component
 +
 you don't need special creation logic
 
-Use @Bean when:
+Use **@Bean** when:
 
 You need explicit creation/configuration
 OR
@@ -1037,7 +1037,7 @@ you need custom constructor arguments
 OR
 you need special setup
 
-📚 19. Real-World @Bean Example — Third-Party Class
+📚 19. Real-World **@Bean** Example — Third-Party Class
 
 Suppose you need a class from a library:
 
@@ -1082,7 +1082,7 @@ Spring Container
       ↓
 Dependency Injection
 
-🎛️ 20. @Primary — Which Bean Should Be Preferred?
+🎛️ 20. **@Primary** — Which Bean Should Be Preferred?
 
 Suppose you have:
 
@@ -1100,7 +1100,7 @@ PaymentService paymentService;
 
 Spring sees multiple candidates.
 
-@Primary says:
+**@Primary** says:
 
 "Prefer this Bean when multiple matching Beans exist."
 
@@ -1127,7 +1127,7 @@ Multiple matching Beans
         ↓
 Choose this one by default
 
-🎯 21. @Qualifier — Which Exact Bean Do I Want?
+🎯 21. **@Qualifier** — Which Exact Bean Do I Want?
 
 Sometimes you don't want a default. You want a specific implementation.
 
@@ -1154,7 +1154,7 @@ This says:
 
 "Give me the Stripe PaymentService here."
 
-@Primary vs @Qualifier
+**@Primary** vs **@Qualifier**
 
 @Primary
     → preferred/default candidate
@@ -1162,11 +1162,11 @@ This says:
 @Qualifier
     → exact candidate I explicitly want
 
-Use @Primary when one implementation should normally win.
+Use **@Primary** when one implementation should normally win.
 
-Use @Qualifier when the choice should be explicit at the injection point.
+Use **@Qualifier** when the choice should be explicit at the injection point.
 
-🔀 22. @ConditionalOnProperty — Configuration Decides Which Bean Exists
+🔀 22. **@ConditionalOnProperty** — Configuration Decides Which Bean Exists
 
 This is useful when configuration should decide whether a Bean is created.
 
@@ -1238,7 +1238,7 @@ PaymentService
 
 without knowing which concrete implementation is active.
 
-⚙️ 23. @ConditionalOnProperty — name, havingValue, matchIfMissing
+⚙️ 23. **@ConditionalOnProperty** — name, havingValue, matchIfMissing
 
 Example:
 
@@ -1277,7 +1277,7 @@ This means the condition can still match when the property is not present.
 
 Use this deliberately because it establishes a default behavior.
 
-📍 24. Where Do I Configure @ConditionalOnProperty?
+📍 24. Where Do I Configure **@ConditionalOnProperty**?
 
 Usually in:
 
@@ -1310,11 +1310,11 @@ you normally restart the application so Spring can rebuild the ApplicationContex
 
 This is not normally a live switch that immediately replaces a Bean while the application is already running.
 
-🆚 25. @ConditionalOnProperty vs @Primary vs @Qualifier
+🆚 25. **@ConditionalOnProperty** vs **@Primary** vs **@Qualifier**
 
 This distinction is extremely important.
 
-@ConditionalOnProperty
+**@ConditionalOnProperty**
 
 Asks:
 
@@ -1324,7 +1324,7 @@ Configuration
     ↓
 Which Bean is created?
 
-@Primary
+**@Primary**
 
 Asks:
 
@@ -1334,7 +1334,7 @@ Multiple Beans
     ↓
 Which one is the default?
 
-@Qualifier
+**@Qualifier**
 
 Asks:
 
@@ -1355,7 +1355,7 @@ Easy memory
 @Qualifier
     → exact selection
 
-🌍 26. @Profile vs @ConditionalOnProperty
+🌍 26. @Profile vs **@ConditionalOnProperty**
 
 These are related but solve different problems.
 
@@ -1371,7 +1371,7 @@ Example idea:
 
 @Profile("prod")
 
-@ConditionalOnProperty
+**@ConditionalOnProperty**
 
 Usually used around a specific configuration decision:
 
@@ -1385,9 +1385,9 @@ Easy memory
 @ConditionalOnProperty
     → Which configuration option?
 
-▶️ 27. CommandLineRunner
+▶️ 27. **CommandLineRunner**
 
-CommandLineRunner is used when you want Spring Boot to execute custom code automatically after the application has started.
+**CommandLineRunner** is used when you want Spring Boot to execute custom code automatically after the application has started.
 
 Example:
 
@@ -1427,9 +1427,9 @@ Print startup information
 
 It is an optional startup hook.
 
-You do not need CommandLineRunner just to start a Spring Boot application.
+You do not need **CommandLineRunner** just to start a Spring Boot application.
 
-🧠 28. Your CommandLineRunner Doubt — Exactly Where Does It Run?
+🧠 28. Your **CommandLineRunner** Doubt — Exactly Where Does It Run?
 
 Suppose:
 
@@ -1467,7 +1467,7 @@ B
 
 So the important point is:
 
-main() starts first. CommandLineRunner.run() executes later, as part of Spring Boot startup. After it finishes, control can return to the code after SpringApplication.run() in main().
+main() starts first. **CommandLineRunner**.run() executes later, as part of Spring Boot startup. After it finishes, control can return to the code after SpringApplication.run() in main().
 
 Also remember:
 
@@ -1479,7 +1479,7 @@ CommandLineRunner.run()
 
 They are two different run() methods.
 
-🔗 29. Full Example — How DI, @ConditionalOnProperty, and @RestController Work Together
+🔗 29. Full Example — How DI, **@ConditionalOnProperty**, and **@RestController** Work Together
 
 Imagine a payment system.
 
@@ -1611,7 +1611,7 @@ instead of:
 
 new PaymentService()
 
-"Is @Autowired the same as constructor injection?"
+"Is **@Autowired** the same as constructor injection?"
 
 No.
 
@@ -1621,7 +1621,7 @@ Constructor Injection
 @Autowired
     → marks an injection point
 
-"Why does my code work with or without @Autowired?"
+"Why does my code work with or without **@Autowired**?"
 
 Because your class has one constructor and Spring can normally use it automatically.
 
@@ -1631,21 +1631,21 @@ Yes.
 
 The issue is not Java. The issue is which constructor Spring should use to create the Bean.
 
-"Does @Autowired create the object?"
+"Does **@Autowired** create the object?"
 
 No.
 
-Spring creates/manages the Bean. @Autowired tells Spring where to inject it.
+Spring creates/manages the Bean. **@Autowired** tells Spring where to inject it.
 
-"Why use private final?"
+"Why use **private final**?"
 
 Because a required constructor-injected dependency usually should not be reassigned after construction.
 
-"Why can't I normally use final with field injection?"
+"Why can't I normally use **final** with field injection?"
 
-Because field injection happens after object construction, while a final field needs to be initialized as part of construction (or another valid initialization path).
+Because field injection happens after object construction, while a **final** field needs to be initialized as part of construction (or another valid initialization path).
 
-"Why is @RestController not printing anything?"
+"Why is **@RestController** not printing anything?"
 
 Because it does not automatically execute methods. A matching HTTP request must arrive.
 
@@ -1653,11 +1653,11 @@ Because it does not automatically execute methods. A matching HTTP request must 
 
 Because the application is configured as a web application. Spring Boot starts the embedded server and waits for requests.
 
-"Why use @Bean when I can use @Component?"
+"Why use **@Bean** when I can use **@Component**?"
 
-Use @Bean when you need explicit/custom creation or when the class is outside your control, such as a third-party library class.
+Use **@Bean** when you need explicit/custom creation or when the class is outside your control, such as a third-party library class.
 
-"What is the difference between @Primary and @Qualifier?"
+"What is the difference between **@Primary** and **@Qualifier**?"
 
 @Primary
     → choose the preferred/default Bean
@@ -1665,7 +1665,7 @@ Use @Bean when you need explicit/custom creation or when the class is outside yo
 @Qualifier
     → explicitly choose the exact Bean
 
-"What is the difference between @ConditionalOnProperty and @Qualifier?"
+"What is the difference between **@ConditionalOnProperty** and **@Qualifier**?"
 
 @ConditionalOnProperty
     → decides which Bean should exist
@@ -1749,41 +1749,41 @@ Constructor Injection means required dependencies are supplied through the class
 
 Why is Constructor Injection preferred?
 
-It makes dependencies explicit, works naturally with final, supports easier testing, and makes required dependencies visible at object creation time.
+It makes dependencies explicit, works naturally with **final**, supports easier testing, and makes required dependencies visible at object creation time.
 
-What is @Autowired?
+What is **@Autowired**?
 
-@Autowired identifies an injection point. With a single constructor, it is usually not required.
+**@Autowired** identifies an injection point. With a single constructor, it is usually not required.
 
-What is @Bean?
+What is **@Bean**?
 
-@Bean registers the object returned by a configuration method as a Spring-managed Bean.
+**@Bean** registers the object returned by a configuration method as a Spring-managed Bean.
 
-What is @Configuration?
+What is **@Configuration**?
 
-@Configuration identifies a class that contains Spring configuration, commonly including @Bean definitions.
+**@Configuration** identifies a class that contains Spring configuration, commonly including **@Bean** definitions.
 
 What is Auto-Configuration?
 
 Spring Boot automatically configures common infrastructure based on the application's dependencies, configuration, and conditions.
 
-What is @ConditionalOnProperty?
+What is **@ConditionalOnProperty**?
 
 It conditionally registers a Bean based on the value of a configuration property.
 
-What is @Primary?
+What is **@Primary**?
 
 It marks a preferred Bean when multiple Beans match a dependency.
 
-What is @Qualifier?
+What is **@Qualifier**?
 
 It identifies a specific Bean to inject when multiple candidates exist.
 
-What is CommandLineRunner?
+What is **CommandLineRunner**?
 
 It executes custom code automatically after Spring Boot startup.
 
-What is @RestController?
+What is **@RestController**?
 
 It identifies a Spring-managed REST controller whose mapped methods can handle HTTP requests.
 

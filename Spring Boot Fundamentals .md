@@ -1,65 +1,78 @@
-## Spring Boot Fundamentals 
+🌱 Spring Boot Fundamentals
 
-These notes cover the Spring Boot fundamentals learned after the Project Structure topic.
+Level: Beginner-friendly explanation with the depth expected from a developer with around 3 years of experience.
+Focus: Understand the why, not just the annotations. Each topic includes the idea, practical example, when to use it, common doubts, and the relationship with the other Spring concepts.
 
-Style: Simple language + clear examples + internal flow + practical scenarios + common doubts + interview-ready points.
+🧭 1. The Big Picture — What Spring Boot Is Actually Doing
 
-Target level: Beginner-friendly explanation with the depth expected from a developer with around 3 years of experience.
+The easiest way to understand Spring Boot is to stop thinking of it as "a set of annotations" and instead think of it as a framework that takes responsibility for starting your application, creating/managing objects, wiring those objects together, loading configuration, and setting up common infrastructure.
 
-1️⃣ The Big Picture — What Spring Boot Is Actually Doing
-
-When you start a Spring Boot application, the most important thing to understand is that Spring is taking responsibility for a lot of work that you would otherwise have to do manually.
-
-In a normal Java application, you create objects yourself using new, connect those objects together, configure them, and decide when they should be created. In Spring Boot, you describe what your application needs, and Spring creates and manages many of those objects for you.
-
-The overall flow is:
-
-You click Run
-      ↓
-JVM starts
-      ↓
-main() executes
-      ↓
-SpringApplication.run(...)
-      ↓
-Spring Boot starts
-      ↓
-ApplicationContext / Spring Container is created
-      ↓
-Configuration is loaded
-      ↓
-Components are discovered
-      ↓
-Beans are registered
-      ↓
-Auto-configuration is applied
-      ↓
-Beans are created
-      ↓
-Dependencies are injected
-      ↓
-Embedded server starts
-      ↓
-CommandLineRunner / ApplicationRunner runs
-      ↓
-Application is ready
-
-The best way to learn Spring is to understand this flow and then place each annotation/concept inside it.
-
-2️⃣ IoC — Inversion of Control
-
-What is IoC?
-
-IoC means:
-
-Spring takes control of creating and managing application objects instead of your code doing everything itself.
-
-Without Spring:
+In plain Java, you normally control object creation yourself:
 
 PaymentService paymentService = new PaymentService();
 OrderService orderService = new OrderService(paymentService);
 
-Here, you control object creation.
+You decide what gets created, when it gets created, and which object gets passed where.
+
+With Spring, you describe what your application needs and Spring takes over much of that responsibility:
+
+Your application
+      ↓
+Spring Boot
+      ↓
+Spring Container / ApplicationContext
+      ↓
+Creates and manages Beans
+      ↓
+Injects their dependencies
+      ↓
+Configures required infrastructure
+      ↓
+Application becomes ready
+
+So the high-level startup flow is:
+
+JVM starts
+   ↓
+main()
+   ↓
+SpringApplication.run(...)
+   ↓
+Spring Boot starts
+   ↓
+ApplicationContext is created
+   ↓
+Configuration is prepared
+   ↓
+Components are scanned
+   ↓
+Beans are registered
+   ↓
+Auto-configuration is applied
+   ↓
+Beans are created
+   ↓
+Dependencies are injected
+   ↓
+Embedded server starts (web application)
+   ↓
+CommandLineRunner / ApplicationRunner runs
+   ↓
+Application is ready
+
+Core idea: Spring Boot is doing the infrastructure and object-management work so your code can focus more on business logic.
+
+🔄 2. IoC — Inversion of Control
+
+IoC means Spring takes control of creating and managing application objects instead of your application code doing it directly.
+
+Without Spring:
+
+PaymentService paymentService = new PaymentService();
+
+You are saying:
+
+"I will create and manage this object."
 
 With Spring:
 
@@ -67,39 +80,44 @@ With Spring:
 public class PaymentService {
 }
 
-Spring can create and manage the PaymentService object.
+you are telling Spring that this class can be managed as a Bean. Spring can then create the object and manage its lifecycle.
 
-So the basic idea is:
+A useful comparison is:
 
 Without IoC
     ↓
-You create/manage objects
+You create objects
+    ↓
+You connect objects
+    ↓
+You manage them
+
 
 With IoC
     ↓
-Spring creates/manages objects
+Spring creates objects
+    ↓
+Spring connects objects
+    ↓
+Spring manages them
 
 Why do we need IoC?
 
-In a small application, manually creating objects is easy.
+For a tiny program, manual new statements are fine. In a real application, you might have:
 
-But imagine a real application:
-
-OrderController
-      ↓
-OrderService
-      ↓
-PaymentService
-      ↓
-PaymentRepository
-      ↓
+Controller
+    ↓
+Service
+    ↓
+Repository
+    ↓
 Database
 
-There may be hundreds of objects and many dependencies.
+and dozens or hundreds of classes.
 
-Manually managing all those new statements becomes difficult and tightly coupled.
+If every class creates its own dependencies, the application becomes tightly coupled (classes depend directly on concrete implementations and know too much about object creation).
 
-Spring takes over this responsibility.
+Spring takes that responsibility out of your business classes.
 
 Easy analogy
 
@@ -107,81 +125,79 @@ Think of an office.
 
 Without IoC:
 
-Every employee arranges their own desk,
-computer, internet and equipment.
+Every employee has to arrange their own laptop, desk, internet connection, and equipment.
 
 With IoC:
 
-The office management provides everything.
-Employees simply use what they need.
+The office infrastructure team provides those things. Employees simply use them.
 
-Spring is acting like the office management.
+Spring is acting like that infrastructure team.
 
-3️⃣ Spring Container / ApplicationContext
+Remember:
+IoC = Spring takes control of object creation and management.
 
-What is the Spring Container?
+📦 3. Spring Container & ApplicationContext
 
-The Spring Container is the system responsible for creating and managing Spring Beans.
-
-Think of it as:
-
-Spring's central object-management system.
-
-It can:
-
-Create Beans
-Store/manage Beans
-Inject dependencies
-Manage Bean lifecycle
-Read configuration
-Apply conditions
+The Spring Container is the system that creates and manages Spring Beans. It knows which Beans exist, what they depend on, and when they should be created or destroyed.
 
 A simplified view:
 
-                Spring Container
+                 Spring Container
                        │
         ┌──────────────┼──────────────┐
         ↓              ↓              ↓
  PaymentService    EmailService    OrderService
      Bean              Bean             Bean
 
-What is ApplicationContext?
+The commonly used Spring container abstraction is the ApplicationContext.
 
-ApplicationContext is the commonly used Spring container abstraction.
-
-For learning purposes:
+For learning, think of:
 
 Spring Container
-       ↓
+      ↓
 ApplicationContext
-       ↓
-manages Spring Beans
+      ↓
+Central place where Spring manages Beans
 
-So when someone says:
+It is responsible for things such as:
 
-"Spring Container"
+Creating and managing Beans
 
-or:
+Wiring dependencies
 
-"ApplicationContext"
+Reading application configuration
 
-they are often talking about the central place/system where Spring manages the application's Beans.
+Applying conditions
 
-Why is it important?
+Managing Bean lifecycle
 
-Suppose:
+Supporting application events and other framework services
+
+Why does this matter?
+
+Suppose you write:
 
 public OrderService(PaymentService paymentService) {
     this.paymentService = paymentService;
 }
 
-Spring can look into the ApplicationContext and find the PaymentService Bean it should provide.
+You did not create the PaymentService.
 
-4️⃣ What Is a Bean?
+Spring can look at the ApplicationContext, find the appropriate PaymentService Bean, and provide it to the OrderService constructor.
 
-A Bean is:
+Important distinction:
 
-An object that is created and managed by Spring.
+ApplicationContext
+    → manages Spring Beans
+
+Java heap
+    → contains Java objects in general
+
+Not every Java object is necessarily a Spring Bean.
+
+🫘 4. What Is a Spring Bean?
+
+A Bean is simply an object managed by Spring.
 
 For example:
 
@@ -189,9 +205,9 @@ For example:
 public class PaymentService {
 }
 
-Spring can create an object of PaymentService and manage it as a Bean.
+Spring can create an instance of PaymentService and register it in its container.
 
-Think:
+Conceptually:
 
 PaymentService class
         ↓
@@ -201,7 +217,7 @@ Spring manages object
         ↓
 PaymentService Bean
 
-Important doubt: Is every Java object a Bean?
+Is every Java object a Bean?
 
 No.
 
@@ -211,15 +227,17 @@ PaymentService service = new PaymentService();
 
 creates a normal Java object.
 
-It does not automatically mean Spring manages that object.
+That object is not automatically a Spring-managed Bean just because it is a Java object.
 
-A Spring Bean is specifically an object that has been registered with the Spring Container.
+A useful rule is:
 
-5️⃣ How Does Spring Know Which Classes to Manage?
+Bean = object that Spring knows about and manages.
+
+🔎 5. How Does Spring Know Which Classes to Manage?
 
 Spring commonly uses component scanning.
 
-You will see annotations such as:
+Classes annotated with Spring stereotypes can be discovered:
 
 @Component
 @Service
@@ -227,45 +245,50 @@ You will see annotations such as:
 @Controller
 @RestController
 
-These make classes discoverable as Spring-managed components in the appropriate context.
-
 The simplified flow is:
 
 @SpringBootApplication
         ↓
 Component Scanning
         ↓
-Spring searches application packages
+Search application packages
         ↓
-Finds @Component / @Service / @Repository / ...
+Find Spring components
         ↓
-Registers them as Beans
+Register them as Beans
 
 Why does package location matter?
 
-Suppose your main class is:
+Suppose your main class is in:
 
 com.example.demo
 
-and your classes are:
+and your classes are in:
 
 com.example.demo.controller
 com.example.demo.service
 com.example.demo.repository
 
-These are under the application's package, so component scanning can discover them.
+These are subpackages of the application package, so Spring can discover them through component scanning.
 
-That is why you often see:
+That's why a common structure is:
 
 com.example.demo
-    ├── DemoApplication
-    ├── controller
-    ├── service
-    └── repository
+├── DemoApplication
+├── controller/
+├── service/
+└── repository/
 
-6️⃣ @SpringBootApplication
+Easy rule
 
-Typical application class:
+Keep the main Spring Boot application class at the appropriate root package so your application components are naturally inside the scanning area.
+
+Remember:
+Component scanning finds candidate classes; Spring then registers/creates the corresponding Beans.
+
+🚀 6. @SpringBootApplication and Application Startup
+
+A typical Spring Boot application starts like this:
 
 @SpringBootApplication
 public class DemoApplication {
@@ -275,9 +298,7 @@ public class DemoApplication {
     }
 }
 
-@SpringBootApplication is a convenience annotation that brings together major Spring Boot features.
-
-For learning, remember it conceptually as:
+@SpringBootApplication is a convenience annotation that brings together major Spring Boot functionality. For learning purposes, remember it conceptually as:
 
 @Configuration
 +
@@ -285,92 +306,83 @@ For learning, remember it conceptually as:
 +
 @EnableAutoConfiguration
 
-That means the application class participates in:
+That gives the application three major capabilities:
 
-configuration
-component scanning
-auto-configuration
+Configuration
+    → application configuration can be defined
 
-You do not need to memorize its internal source code at this stage. The important point is understanding what role it plays during startup.
+Component Scan
+    → discover Spring components
 
-7️⃣ main() → SpringApplication.run() → Spring Starts
+Auto-Configuration
+    → Spring Boot configures common infrastructure automatically
 
-Java always begins with:
+main() vs SpringApplication.run()
+
+Java starts with:
 
 public static void main(String[] args)
 
-Inside a Spring Boot application you normally see:
+Then:
 
 SpringApplication.run(DemoApplication.class, args);
 
-The sequence is:
+bootstraps the Spring application.
+
+Think:
 
 JVM
  ↓
 main()
  ↓
-SpringApplication.run(...)
+SpringApplication.run()
  ↓
 Spring Boot startup
 
-Important doubt
+🏗️ 7. Spring Boot Startup Flow — What Happens After You Click Run?
 
-main() executes first.
+When you click Run in IntelliJ, Java executes main() first.
 
-CommandLineRunner.run() does NOT execute before main().
-
-The CommandLineRunner.run() method is triggered later as part of the Spring startup lifecycle.
-
-8️⃣ Spring Boot Startup Flow — Detailed but Easy
-
-This is the flow you should be comfortable explaining in an interview:
+The detailed high-level flow is:
 
 1. JVM starts
-       ↓
+        ↓
 2. main() executes
-       ↓
+        ↓
 3. SpringApplication.run(...) is called
-       ↓
+        ↓
 4. Spring Boot prepares the application
-       ↓
+        ↓
 5. ApplicationContext is created
-       ↓
+        ↓
 6. Environment is prepared
    - application.properties / application.yml
    - command-line arguments
    - active profiles
-       ↓
+        ↓
 7. Components are discovered
-       ↓
+        ↓
 8. Bean definitions are registered
-       ↓
+        ↓
 9. Auto-configuration is applied
-       ↓
+        ↓
 10. ApplicationContext is refreshed
-       ↓
+        ↓
 11. Beans are created
-       ↓
+        ↓
 12. Dependencies are injected
-       ↓
+        ↓
 13. Bean lifecycle callbacks happen
-       ↓
-14. Embedded web server starts (for a web app)
-       ↓
+        ↓
+14. Embedded web server starts
+        ↓
 15. CommandLineRunner / ApplicationRunner executes
-       ↓
-16. Application is ready
+        ↓
+16. Application is fully started
 
-This flow connects most of the topics in this document.
+What does "necessary startup work" mean?
 
-9️⃣ What Does "Spring Does the Necessary Work" Mean?
-
-You asked what "necessary" means.
-
-It simply means:
-
-Spring performs the setup required to make your application operational.
-
-Examples:
+It simply means the work Spring needs to perform to make your application operational, such as:
 
 Read configuration
 Create ApplicationContext
@@ -379,57 +391,57 @@ Register Beans
 Apply auto-configuration
 Create Beans
 Inject dependencies
-Initialize Beans
-Start the web server
+Initialize lifecycle callbacks
+Start web infrastructure
 Run startup callbacks
 
-Do not think:
+One important correction:
 
-"Spring executes every dependency."
+Spring does not simply "execute all dependencies."
 
-A dependency is a library your project uses.
+A dependency is a library your application uses. Spring uses the relevant classes and infrastructure from those libraries during startup.
 
-Spring uses the relevant libraries and infrastructure while building and starting the application.
+⚙️ 8. Auto-Configuration
 
-🔟 Auto-Configuration
-
-What is Auto-Configuration?
-
-Auto-configuration means:
-
-Spring Boot automatically configures common infrastructure based on the application's dependencies, configuration and conditions.
+Auto-Configuration means Spring Boot automatically configures common infrastructure based on the application's classpath, dependencies, configuration, and conditions.
 
 For example, when web support is present:
 
 Web dependencies
       ↓
-Spring Boot recognizes web application requirements
+Spring Boot recognizes web application
       ↓
-Web/MVC infrastructure is configured
+Common MVC/web infrastructure is configured
       ↓
 Embedded server can be started
 
-You do not have to manually configure every piece of common web infrastructure.
+Instead of manually configuring every piece of the web stack, Spring Boot provides sensible defaults.
 
-Why is this useful?
+Why is Auto-Configuration useful?
 
-Without Spring Boot, many framework settings would have to be configured manually.
+Without Spring Boot, you would have to configure much more framework infrastructure yourself.
 
-Spring Boot tries to provide sensible defaults so that you can focus more on application logic.
+Spring Boot follows the idea:
 
-Simple mental model
+You declare what you need
+        ↓
+Spring Boot provides sensible defaults
+
+This is one of the biggest productivity benefits of Spring Boot.
+
+Simple analogy
 
 You say:
+
 "I am building a web application."
 
 Spring Boot says:
-"Okay, I'll configure the common web infrastructure."
 
-1️⃣1️⃣ Dependency Injection (DI)
+"Okay, I will configure the common web infrastructure for you."
 
-Dependency Injection means:
+🔌 9. Dependency Injection (DI)
 
-An object receives the objects it needs from Spring instead of creating those objects itself.
+Dependency Injection means an object receives the objects it needs instead of creating those objects itself.
 
 Suppose:
 
@@ -445,7 +457,7 @@ public class OrderService {
             new PaymentService();
 }
 
-OrderService creates the dependency itself.
+OrderService is responsible for creating its dependency.
 
 With DI:
 
@@ -459,7 +471,7 @@ public class OrderService {
     }
 }
 
-Now Spring can provide PaymentService.
+Now Spring can provide the dependency.
 
 The mental model is:
 
@@ -469,21 +481,35 @@ OrderService
       ↓
 Spring provides PaymentService
 
-1️⃣2️⃣ IoC vs DI
+Why is DI useful?
 
-These two are related, but they are not the same thing.
+DI reduces the responsibility of classes.
+
+Instead of:
+
+"I need a PaymentService, so I will create one."
+
+the class says:
+
+"I need a PaymentService. Someone else can provide it."
+
+That makes the application easier to test, replace, and maintain.
+
+🔁 10. IoC vs DI — Do Not Mix Them Up
+
+These concepts are related, but they are not identical.
 
 IoC
 
-IoC is the bigger idea:
+IoC is the broader principle:
 
 Spring takes control of object creation and management.
 
 DI
 
-DI is one of the main ways Spring provides that control:
+DI is one of the main mechanisms used to implement that idea:
 
-Spring provides required dependencies to an object.
+Spring provides dependencies to an object.
 
 Easy memory:
 
@@ -503,13 +529,11 @@ Spring injects them
 So:
 
 IoC = broader principle
-DI  = mechanism/pattern used to implement it
+DI  = dependency-provision mechanism
 
-1️⃣3️⃣ Constructor Injection
+🏗️ 11. Constructor Injection
 
-Constructor Injection means:
-
-The dependency is supplied through the constructor.
+Constructor Injection means the dependency enters the class through its constructor.
 
 Example:
 
@@ -541,25 +565,15 @@ Spring provides the dependency.
 
 Why is Constructor Injection preferred?
 
-It makes required dependencies very clear.
+It makes required dependencies explicit.
 
-If the class needs:
-
-PaymentService
-
-then the constructor says:
+If the class cannot work without PaymentService, the constructor shows that immediately:
 
 public OrderService(PaymentService paymentService)
 
-That communicates:
+It also works naturally with final fields and makes unit testing straightforward because the test can provide the dependency directly.
 
-"OrderService needs PaymentService to be properly created."
-
-It also works naturally with final fields and makes testing easier.
-
-1️⃣4️⃣ private final with Constructor Injection
-
-Common professional pattern:
+Good default pattern
 
 private final PaymentService paymentService;
 
@@ -567,39 +581,51 @@ public OrderService(PaymentService paymentService) {
     this.paymentService = paymentService;
 }
 
-What does private mean?
+🔒 12. private final — Why Do We Usually Use It?
 
-Only this class directly accesses the field.
+In constructor injection, you will very often see:
 
-What does final mean?
+private final PaymentService paymentService;
 
-The field/reference cannot be reassigned after it has been initialized.
+These two keywords do different jobs.
 
-For example:
+private
 
-this.paymentService = paymentService;
+Only the class itself directly accesses the field.
 
-After initialization, you cannot normally do:
+final
+
+The field/reference cannot be reassigned after initialization.
+
+Example:
+
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+
+After that, this is not allowed:
 
 this.paymentService = anotherPaymentService;
 
 because the field is final.
 
-Why use private final?
+Why is final a good fit for dependencies?
 
-For a required dependency that should remain associated with the object:
+Because a required dependency is usually part of the object's identity and should not suddenly be replaced after construction.
 
-required dependency
-       ↓
-constructor injection
-       ↓
+The pattern becomes:
+
+Required dependency
+        ↓
+Constructor Injection
+        ↓
 private final field
 
-This is one of the most common Spring patterns.
+This is why you see this pattern so often in professional Spring applications.
 
-1️⃣5️⃣ When Should I NOT Use final?
+When should I NOT use final?
 
-Do not use final when the field is intentionally expected to be reassigned.
+Do not use final when you intentionally need the field to be reassigned.
 
 Example:
 
@@ -609,7 +635,7 @@ public void changeStatus(String status) {
     this.status = status;
 }
 
-The value may change:
+Here the value changes:
 
 PENDING
    ↓
@@ -617,31 +643,29 @@ PROCESSING
    ↓
 COMPLETED
 
-Therefore final would not make sense here.
-
-Similarly, if you deliberately use setter injection and want to replace the dependency later:
-
-private PaymentService paymentService;
-
-public void setPaymentService(PaymentService paymentService) {
-    this.paymentService = paymentService;
-}
-
-the field cannot be final.
+So final would not make sense.
 
 Important distinction
 
 private final PaymentService paymentService;
 
-does not mean the object itself can never change internally.
+does not mean the PaymentService object itself can never change internally.
 
-It means:
+It means the field cannot be reassigned to a different object.
 
-The field cannot be reassigned to another object.
+Think:
 
-1️⃣6️⃣ @Autowired
+final
+    ↓
+"Do not replace this reference."
 
-@Autowired is an annotation that identifies an injection point for Spring.
+not:
+
+"The entire object is immutable."
+
+🪝 13. @Autowired — What It Actually Does
+
+@Autowired identifies an injection point for Spring.
 
 Example:
 
@@ -650,45 +674,29 @@ public OrderService(PaymentService paymentService) {
     this.paymentService = paymentService;
 }
 
-Think:
+Keep the concepts separate:
 
 Constructor Injection
-    ↓
-HOW the dependency arrives
+    → HOW the dependency enters
 
 @Autowired
-    ↓
-Explicitly marks the injection point
+    → explicitly marks WHERE Spring should inject
 
-They are related, but they are not the same concept.
+Do we need @Autowired on a constructor?
 
-1️⃣7️⃣ Do We Need @Autowired on a Constructor?
+If the class has only one constructor, usually no.
 
-If a class has only one constructor, usually no.
+Both work:
 
-This works:
-
-@Service
-public class OrderService {
-
-    private final PaymentService paymentService;
-
-    public OrderService(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
 }
 
-This also works:
+and:
 
-@Service
-public class OrderService {
-
-    private final PaymentService paymentService;
-
-    @Autowired
-    public OrderService(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
+@Autowired
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
 }
 
 So in this situation:
@@ -702,21 +710,39 @@ Without @Autowired
 Practical result
     → same
 
-Why did you see no difference when testing it?
+Why did your experiment show no difference?
 
-Because your class had only one constructor.
+Because your class had one constructor. Spring already knows that this is the constructor it should use.
 
-Spring already knows:
+When is @Autowired useful on a constructor?
 
-"There is only one constructor. I can use it."
-
-So adding @Autowired did not visibly change your result.
-
-1️⃣8️⃣ Multiple Constructors and @Autowired
-
-Java allows multiple constructors.
+When there are multiple constructors and you want to clearly identify the one Spring should use.
 
 Example:
+
+@Service
+public class OrderService {
+
+    public OrderService() {
+    }
+
+    @Autowired
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+
+Here:
+
+Multiple constructors
+        ↓
+Spring needs an injection constructor
+        ↓
+@Autowired identifies it
+
+Important: Java DOES allow multiple constructors
+
+This is valid Java:
 
 public class Car {
 
@@ -727,95 +753,13 @@ public class Car {
     }
 }
 
-There is nothing wrong with that.
+The issue is not that Java forbids multiple constructors.
 
-The Spring problem is different.
+The issue is:
 
-If Spring sees:
+When Spring creates the Bean, which constructor should Spring use?
 
-Constructor 1
-    ↓
-no dependency
-
-Constructor 2
-    ↓
-PaymentService dependency
-
-Spring may need help deciding which constructor should be used.
-
-You can explicitly mark the intended constructor:
-
-@Autowired
-public OrderService(PaymentService paymentService) {
-    this.paymentService = paymentService;
-}
-
-So remember:
-
-Java
-    → multiple constructors are allowed
-
-Spring
-    → may need to know which constructor to use for injection
-
-1️⃣9️⃣ Field Injection
-
-Example:
-
-@Service
-public class OrderService {
-
-    @Autowired
-    private PaymentService paymentService;
-}
-
-Spring creates the OrderService object and then injects the dependency into the field.
-
-Conceptually:
-
-Create OrderService
-       ↓
-Find PaymentService Bean
-       ↓
-Put it into paymentService field
-
-This works, but Constructor Injection is generally preferred for required dependencies because constructor injection makes dependencies explicit and supports immutable (final) fields.
-
-Important
-
-For ordinary field injection, you normally do not use:
-
-@Autowired
-private final PaymentService paymentService;
-
-because final requires initialization through a constructor or another valid initialization mechanism, while field injection happens after construction.
-
-2️⃣0️⃣ Setter Injection
-
-Example:
-
-@Service
-public class OrderService {
-
-    private PaymentService paymentService;
-
-    @Autowired
-    public void setPaymentService(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
-}
-
-Flow:
-
-Create OrderService
-       ↓
-Call setPaymentService(...)
-       ↓
-PaymentService is injected
-
-Setter Injection can be useful when a dependency is optional or intentionally replaceable.
-
-2️⃣1️⃣ Constructor vs Field vs Setter Injection
+🧩 14. Three Main Dependency Injection Styles
 
 Constructor Injection
 
@@ -825,27 +769,31 @@ public OrderService(PaymentService paymentService) {
     this.paymentService = paymentService;
 }
 
-Use when the dependency is required.
-
-Recommended default.
+Best default for required dependencies.
 
 Field Injection
 
 @Autowired
 private PaymentService paymentService;
 
-Easy to write, but generally not the preferred default for required dependencies.
+Spring creates the object and then injects the field.
+
+It is supported and simple, but generally not the preferred default for required dependencies because the dependency is less explicit and the field cannot naturally be final.
 
 Setter Injection
+
+private PaymentService paymentService;
 
 @Autowired
 public void setPaymentService(PaymentService paymentService) {
     this.paymentService = paymentService;
 }
 
-Useful when a dependency is optional or intentionally changeable.
+Spring creates the object and then calls the setter.
 
-Quick memory
+This can make sense when a dependency is optional or intentionally replaceable.
+
+Quick decision
 
 Required dependency
     → Constructor Injection
@@ -854,45 +802,11 @@ Optional/changeable dependency
     → Setter Injection can make sense
 
 Field Injection
-    → supported, but generally avoid as your default
+    → Supported, but generally avoid as your default
 
-2️⃣2️⃣ @Autowired Does NOT Create the Bean
+🏷️ 15. @Component, @Service, @Repository, @Controller, @RestController
 
-This is a common beginner misunderstanding.
-
-Wrong idea:
-
-@Autowired
-    ↓
-creates PaymentService
-
-Correct idea:
-
-PaymentService is registered as a Bean
-        ↓
-Spring manages it
-        ↓
-@Autowired identifies an injection point
-        ↓
-Spring provides the Bean there
-
-For example:
-
-@Component
-public class PaymentService {
-}
-
-and:
-
-public OrderService(PaymentService paymentService) {
-    this.paymentService = paymentService;
-}
-
-Spring provides the PaymentService.
-
-2️⃣3️⃣ @Component, @Service, @Repository, @Controller, @RestController
-
-These are commonly used Spring stereotypes.
+These annotations help Spring identify classes that should participate in component management and communicate their responsibility.
 
 @Component
 
@@ -904,7 +818,7 @@ public class PaymentService {
 
 @Service
 
-Commonly used for service/business logic:
+Commonly used for business/service logic:
 
 @Service
 public class OrderService {
@@ -912,7 +826,7 @@ public class OrderService {
 
 @Repository
 
-Commonly used for database/persistence layer classes:
+Commonly used for persistence/database access:
 
 @Repository
 public class OrderRepository {
@@ -920,42 +834,45 @@ public class OrderRepository {
 
 @Controller
 
-Typically used for MVC controllers.
+Used for traditional Spring MVC controllers.
 
 @RestController
 
-Used for REST APIs.
+Used for REST APIs:
 
-Conceptually:
+@RestController
+public class PaymentController {
+}
+
+A useful way to think about them:
 
 @Component
-    → general Spring component
+    → general component
 
 @Service
-    → service/business logic
+    → business/service layer
 
 @Repository
-    → persistence/database layer
+    → persistence layer
 
 @Controller
-    → MVC web controller
+    → MVC controller
 
 @RestController
-    → REST web controller
+    → REST API controller
 
-These annotations help communicate the responsibility of the class while also participating in Spring's component management.
+🌐 16. @RestController — Your Earlier Doubt
 
-2️⃣4️⃣ @RestController — Important Doubt
-
-You asked earlier:
+You asked:
 
 "Why are we writing @RestController when I am not calling through an endpoint?"
 
-The answer is:
+The answer is that @RestController does two conceptual things:
 
-You do not need @RestController just to practice Dependency Injection.
+1. Makes the class a Spring-managed component
+2. Gives it REST controller semantics
 
-@RestController is useful when the class is intended to receive HTTP requests.
+But it does not automatically execute your methods.
 
 Example:
 
@@ -968,32 +885,48 @@ public class PaymentController {
     }
 }
 
-Now:
+Only when a request arrives:
 
 GET /pay
-    ↓
+   ↓
 PaymentController.pay()
+   ↓
+"Payment successful"
 
-Without an HTTP request, the method is not automatically called.
-
-However, the controller class can still be created as a Spring Bean during startup.
-
-This gives us three separate concepts:
+So these are separate ideas:
 
 @RestController
     → this class is a REST controller
 
-Dependency Injection
-    → Spring provides dependencies
-
 @GetMapping("/pay")
-    → this method handles a specific HTTP request
+    → this method handles GET /pay
 
-Do not mix these three concepts.
+HTTP request
+    → actually triggers the method
 
-2️⃣5️⃣ Manual Bean Creation — @Configuration + @Bean
+Why did Tomcat start even before you called an endpoint?
 
-Sometimes you want Spring to manage an object, but the class is not a component you can simply annotate.
+Because the web dependency tells Spring Boot that the application is a web application.
+
+Conceptually:
+
+Web dependency
+      ↓
+Spring Boot web app
+      ↓
+Embedded Tomcat starts
+      ↓
+Tomcat listens for HTTP requests
+
+Your application can therefore be:
+
+Started ✅
+Tomcat running ✅
+No endpoint called yet ✅
+
+🛠️ 17. Manual Bean Creation — @Configuration + @Bean
+
+Sometimes you want Spring to manage an object, but you don't want or cannot put @Component on the class.
 
 Example:
 
@@ -1006,11 +939,7 @@ public class PaymentService {
     }
 }
 
-Instead of:
-
-@Component
-
-you can explicitly create/register the Bean:
+You can explicitly register it:
 
 @Configuration
 public class AppConfig {
@@ -1021,21 +950,19 @@ public class AppConfig {
     }
 }
 
-What is happening?
+What exactly is happening?
 
 This line:
 
-return new PaymentService("Stripe");
+new PaymentService("Stripe")
 
-manually creates the object.
+is manual object creation.
 
-But:
+But because the method is annotated:
 
 @Bean
 
-tells Spring:
-
-"Register the object returned by this method as a Spring Bean."
+Spring takes the returned object and registers it as a Spring Bean.
 
 So:
 
@@ -1049,36 +976,21 @@ Spring Container
         ↓
 managed Bean
 
-2️⃣6️⃣ Why Do We Need @Configuration?
+Why do we need @Configuration?
 
-Example:
+@Configuration tells Spring:
 
-@Configuration
-public class AppConfig {
-}
+"This class contains configuration instructions."
 
-It tells Spring:
+A common use is to define Beans.
 
-This class contains configuration instructions for the application.
+🆚 18. @Component vs @Bean
 
-A common use is defining Beans with @Bean.
-
-Example:
-
-@Configuration
-public class AppConfig {
-
-    @Bean
-    public PaymentService paymentService() {
-        return new PaymentService("Stripe");
-    }
-}
-
-2️⃣7️⃣ @Component vs @Bean
+These solve the same broad problem—getting an object into the Spring Container—but they are used differently.
 
 @Component
 
-You place it on the class:
+Put it directly on the class:
 
 @Component
 public class PaymentService {
@@ -1090,7 +1002,7 @@ Think:
 
 @Bean
 
-You place it on a method:
+Put it on a method inside configuration:
 
 @Configuration
 public class AppConfig {
@@ -1105,35 +1017,37 @@ Think:
 
 "Spring, use this method to create/register this object."
 
-When should I use what?
+When should I use which?
 
 Use @Component / @Service when:
 
 You control the class
 +
 it naturally belongs as a Spring-managed application component
++
+you don't need special creation logic
 
 Use @Bean when:
 
 You need explicit creation/configuration
 OR
-the class comes from a third-party library
+the class is from a third-party library
 OR
 you need custom constructor arguments
 OR
 you need special setup
 
-2️⃣8️⃣ Real-World @Bean Example — Third-Party Class
+📚 19. Real-World @Bean Example — Third-Party Class
 
-Suppose you need a library class:
+Suppose you need a class from a library:
 
 ObjectMapper
 
-You do not own that class, so you cannot normally go into its source code and add:
+You don't own that class, so you cannot simply modify it and add:
 
 @Component
 
-You can register it from your application:
+Instead, register it from your application:
 
 @Configuration
 public class AppConfig {
@@ -1144,7 +1058,7 @@ public class AppConfig {
     }
 }
 
-Now another Spring class can receive it through DI:
+Now another Spring-managed class can receive it:
 
 @Service
 public class UserService {
@@ -1156,7 +1070,7 @@ public class UserService {
     }
 }
 
-The important chain is:
+The complete flow is:
 
 Third-party class
       ↓
@@ -1168,9 +1082,9 @@ Spring Container
       ↓
 Dependency Injection
 
-2️⃣9️⃣ @Primary
+🎛️ 20. @Primary — Which Bean Should Be Preferred?
 
-Suppose you have multiple implementations:
+Suppose you have:
 
 PaymentService
       ↑
@@ -1178,17 +1092,17 @@ PaymentService
  ↓               ↓
 Stripe          Razorpay
 
-Both may be Spring Beans.
+Both are Spring Beans.
 
-Now another class asks:
+Now another class requests:
 
-PaymentService paymentService
+PaymentService paymentService;
 
 Spring sees multiple candidates.
 
 @Primary says:
 
-Prefer this Bean when multiple matching Beans exist.
+"Prefer this Bean when multiple matching Beans exist."
 
 Example:
 
@@ -1203,11 +1117,19 @@ and:
 public class RazorpayPaymentService implements PaymentService {
 }
 
-Now when Spring needs a PaymentService, Stripe is the preferred candidate.
+Now, when Spring needs a PaymentService, Stripe is the preferred candidate.
 
-3️⃣0️⃣ @Qualifier
+Simple meaning
 
-@Qualifier lets you specify exactly which Bean should be injected.
+Multiple matching Beans
+        ↓
+@Primary
+        ↓
+Choose this one by default
+
+🎯 21. @Qualifier — Which Exact Bean Do I Want?
+
+Sometimes you don't want a default. You want a specific implementation.
 
 Example:
 
@@ -1228,23 +1150,35 @@ public OrderService(
     this.paymentService = paymentService;
 }
 
-This means:
+This says:
 
-"I specifically want the Stripe implementation here."
+"Give me the Stripe PaymentService here."
 
-Simple difference
+@Primary vs @Qualifier
 
 @Primary
     → preferred/default candidate
 
 @Qualifier
-    → exact candidate
+    → exact candidate I explicitly want
 
-3️⃣1️⃣ @ConditionalOnProperty
+Use @Primary when one implementation should normally win.
 
-This is useful when configuration should decide whether a Bean exists.
+Use @Qualifier when the choice should be explicit at the injection point.
 
-Example:
+🔀 22. @ConditionalOnProperty — Configuration Decides Which Bean Exists
+
+This is useful when configuration should decide whether a Bean is created.
+
+Suppose:
+
+PaymentService
+      ↑
+ ┌────┴──────────┐
+ ↓               ↓
+Stripe          Razorpay
+
+Stripe:
 
 @Component
 @ConditionalOnProperty(
@@ -1254,80 +1188,57 @@ Example:
 public class StripePaymentService implements PaymentService {
 }
 
+Razorpay:
+
+@Component
+@ConditionalOnProperty(
+    name = "payment.provider",
+    havingValue = "razorpay"
+)
+public class RazorpayPaymentService implements PaymentService {
+}
+
 Configuration:
 
 payment.provider=stripe
 
-Result:
+Spring checks the property during startup.
 
-Condition = TRUE
+payment.provider = stripe
         ↓
-StripePaymentService Bean is created
+Stripe condition = TRUE
+        ↓
+Stripe Bean exists
 
-If:
+Razorpay condition = FALSE
+        ↓
+Razorpay Bean does not exist
+
+Change the configuration to:
 
 payment.provider=razorpay
 
-then:
+and now Razorpay becomes the active Bean instead.
 
-Condition = FALSE
-        ↓
-StripePaymentService Bean is not created
+Why is this useful?
 
-3️⃣2️⃣ Why Use @ConditionalOnProperty?
-
-Imagine:
-
-PaymentService
-      ↑
- ┌────┴──────────┐
- ↓               ↓
-Stripe          Razorpay
-
-You want configuration to decide which provider is active.
-
-Instead of changing Java code:
-
-payment.provider=stripe
-
-or:
-
-payment.provider=razorpay
-
-Spring decides which Bean should exist.
-
-This is useful for:
+It is very useful for:
 
 Payment provider
-Storage implementation
+Storage provider
 Notification provider
+Mock vs real implementation
 Optional integrations
 Feature switches
-Mock vs real implementation
 Third-party integrations
 
-3️⃣3️⃣ Where Do We Configure the Property?
+The important advantage is that the Java business code can continue using:
 
-Usually:
+PaymentService
 
-src/main/resources/application.properties
+without knowing which concrete implementation is active.
 
-Example:
-
-payment.provider=stripe
-
-Or:
-
-src/main/resources/application.yml
-
-Example:
-
-payment:
-  provider: stripe
-
-The property is externalized configuration.
-
-3️⃣4️⃣ name, havingValue, matchIfMissing
+⚙️ 23. @ConditionalOnProperty — name, havingValue, matchIfMissing
 
 Example:
 
@@ -1338,23 +1249,23 @@ Example:
 
 name
 
-Which configuration property should be checked?
+Which property should Spring check?
 
 payment.provider
 
 havingValue
 
-What value should it contain?
+What value should the property contain?
 
 stripe
 
-So the condition is effectively:
+So the condition is basically:
 
 payment.provider == "stripe"
 
 matchIfMissing
 
-Example:
+You can define behavior when the property is missing:
 
 @ConditionalOnProperty(
     name = "payment.provider",
@@ -1362,31 +1273,32 @@ Example:
     matchIfMissing = true
 )
 
-This means the condition can still match if the property is missing.
+This means the condition can still match when the property is not present.
 
-Use this deliberately because it creates a default behavior.
+Use this deliberately because it establishes a default behavior.
 
-3️⃣5️⃣ When Is @ConditionalOnProperty Checked?
+📍 24. Where Do I Configure @ConditionalOnProperty?
 
-It is checked during application startup while Spring is building/configuring the ApplicationContext.
+Usually in:
 
-The simplified flow is:
+src/main/resources/application.properties
 
-Application starts
-        ↓
-Configuration is read
-        ↓
-Condition is evaluated
-        ↓
-Matching Bean is registered
-        ↓
-Bean is created
-        ↓
-Dependency Injection happens
-        ↓
-Application continues starting
+Example:
 
-If you change:
+payment.provider=stripe
+
+or in:
+
+src/main/resources/application.yml
+
+Example:
+
+payment:
+  provider: stripe
+
+The configuration is read during application startup.
+
+So if you change:
 
 payment.provider=stripe
 
@@ -1394,13 +1306,13 @@ to:
 
 payment.provider=razorpay
 
-normally restart the application so Spring can build the context again using the new configuration.
+you normally restart the application so Spring can rebuild the ApplicationContext using the new configuration.
 
-It is not normally a live switch that instantly swaps the Bean while the application is already running.
+This is not normally a live switch that immediately replaces a Bean while the application is already running.
 
-3️⃣6️⃣ @ConditionalOnProperty vs @Primary vs @Qualifier
+🆚 25. @ConditionalOnProperty vs @Primary vs @Qualifier
 
-This is very important.
+This distinction is extremely important.
 
 @ConditionalOnProperty
 
@@ -1408,31 +1320,31 @@ Asks:
 
 Should this Bean exist?
 
-Config
-  ↓
-Which Bean gets created?
+Configuration
+    ↓
+Which Bean is created?
 
 @Primary
 
 Asks:
 
-If multiple Beans exist, which one should be preferred?
+If multiple matching Beans exist, which one should be preferred?
 
 Multiple Beans
-      ↓
+    ↓
 Which one is the default?
 
 @Qualifier
 
 Asks:
 
-Which specific existing Bean do I want here?
+Which exact Bean should be injected here?
 
 Multiple Beans
-      ↓
-Give me THIS one
+    ↓
+Give me this exact one
 
-Easy memory:
+Easy memory
 
 @ConditionalOnProperty
     → existence
@@ -1443,9 +1355,39 @@ Easy memory:
 @Qualifier
     → exact selection
 
-3️⃣7️⃣ CommandLineRunner
+🌍 26. @Profile vs @ConditionalOnProperty
 
-CommandLineRunner allows you to execute custom code automatically after Spring Boot has started.
+These are related but solve different problems.
+
+@Profile
+
+Usually used around application environments:
+
+dev
+test
+prod
+
+Example idea:
+
+@Profile("prod")
+
+@ConditionalOnProperty
+
+Usually used around a specific configuration decision:
+
+payment.provider=stripe
+
+Easy memory
+
+@Profile
+    → Which environment?
+
+@ConditionalOnProperty
+    → Which configuration option?
+
+▶️ 27. CommandLineRunner
+
+CommandLineRunner is used when you want Spring Boot to execute custom code automatically after the application has started.
 
 Example:
 
@@ -1458,37 +1400,36 @@ public class StartupTask implements CommandLineRunner {
     }
 }
 
-The key flow is:
+The high-level flow is:
 
 main()
    ↓
 SpringApplication.run()
    ↓
-Spring starts
+Spring startup
    ↓
-Beans created/injected
+Beans created and dependencies injected
    ↓
 CommandLineRunner.run()
    ↓
-startup code executes
+Startup code executes
 
-3️⃣8️⃣ Why Use CommandLineRunner?
+Why do we use it?
 
-It is useful for code that should happen automatically after startup.
-
-Examples:
+Typical use cases include:
 
 Load initial data
-Initialize a cache
+Initialize something
+Warm up a cache
 Perform a startup check
-Run development startup logic
+Run development-only startup logic
 Print startup information
 
 It is an optional startup hook.
 
-You do not need it just to start a Spring Boot application.
+You do not need CommandLineRunner just to start a Spring Boot application.
 
-3️⃣9️⃣ Important CommandLineRunner Doubt
+🧠 28. Your CommandLineRunner Doubt — Exactly Where Does It Run?
 
 Suppose:
 
@@ -1508,7 +1449,7 @@ public void run(String... args) {
     System.out.println("C");
 }
 
-The rough sequence is:
+The rough flow is:
 
 A
  ↓
@@ -1524,113 +1465,38 @@ SpringApplication.run() returns
  ↓
 B
 
-So:
+So the important point is:
 
-main() starts first.
+main() starts first. CommandLineRunner.run() executes later, as part of Spring Boot startup. After it finishes, control can return to the code after SpringApplication.run() in main().
 
-Then Spring Boot starts.
+Also remember:
 
-Then CommandLineRunner.run() executes as part of startup.
+SpringApplication.run()
+    → starts Spring Boot
 
-Then control returns from SpringApplication.run() to main().
+CommandLineRunner.run()
+    → startup callback executed by Spring
 
-4️⃣0️⃣ Embedded Tomcat and @RestController
+They are two different run() methods.
 
-If your project has web support, Spring Boot can start an embedded server such as Tomcat.
+🔗 29. Full Example — How DI, @ConditionalOnProperty, and @RestController Work Together
 
-Typical logs:
+Imagine a payment system.
 
-Tomcat initialized with port 8080
-Tomcat started on port 8080
-Started DemoApplication
+                 PaymentService
+                       ↑
+              ┌────────┴────────┐
+              ↓                 ↓
+           Stripe             Razorpay
 
-This means:
-
-Web server started
-Application context started
-Application is ready
-
-It does NOT mean:
-
-Controller method was called
-
-A controller method runs when an HTTP request matches its endpoint.
-
-Example:
-
-@GetMapping("/pay")
-public String pay() {
-    return "Payment successful";
-}
-
-Then:
-
-GET /pay
-    ↓
-PaymentController.pay()
-
-4️⃣1️⃣ Full DI Example
-
-Suppose:
-
-OrderController
-      ↓
-OrderService
-      ↓
-PaymentService
-      ↓
-StripePaymentService
-
-Code:
-
-@Service
-public class OrderService {
-
-    private final PaymentService paymentService;
-
-    public OrderService(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
-}
-
-And:
-
-@Component
-public class StripePaymentService implements PaymentService {
-}
-
-Spring's conceptual flow:
-
-1. Discover StripePaymentService
-        ↓
-2. Register Bean
-        ↓
-3. Discover OrderService
-        ↓
-4. See constructor needs PaymentService
-        ↓
-5. Find matching PaymentService Bean
-        ↓
-6. Create OrderService
-        ↓
-7. Inject PaymentService
-        ↓
-8. Discover/Create OrderController
-        ↓
-9. Inject OrderService
-
-This is the core of DI.
-
-4️⃣2️⃣ Full Payment Provider Example
-
-Interface:
+Interface
 
 public interface PaymentService {
 
     String pay();
 }
 
-Stripe:
+Stripe implementation
 
 @Component
 @ConditionalOnProperty(
@@ -1645,7 +1511,7 @@ public class StripePaymentService implements PaymentService {
     }
 }
 
-Razorpay:
+Razorpay implementation
 
 @Component
 @ConditionalOnProperty(
@@ -1660,11 +1526,11 @@ public class RazorpayPaymentService implements PaymentService {
     }
 }
 
-Configuration:
+Configuration
 
 payment.provider=stripe
 
-Consumer:
+Business service
 
 @Service
 public class OrderService {
@@ -1680,401 +1546,376 @@ public class OrderService {
     }
 }
 
-Result:
-
-payment.provider=stripe
-        ↓
-Stripe condition = TRUE
-        ↓
-Stripe Bean exists
-
-Razorpay condition = FALSE
-        ↓
-Razorpay Bean does not exist
-
-OrderService
-        ↓
-needs PaymentService
-        ↓
-StripePaymentService injected
-
-4️⃣3️⃣ A Practical Decision Guide
-
-When writing Spring code, ask these questions.
-
-"I have a normal application class. How should Spring manage it?"
-
-Usually:
-
-@Component
-@Service
-@Repository
-@Controller
-@RestController
-
-depending on its responsibility.
-
-"The class needs another Spring Bean."
-
-Prefer:
-
-Constructor Injection
-
-with:
-
-private final Dependency dependency;
-
-"I have one constructor."
-
-Usually:
-
-No @Autowired required
-
-"I have multiple constructors."
-
-Consider:
-
-@Autowired
-
-on the intended injection constructor.
-
-"I need to register/configure a third-party class."
-
-Use:
-
-@Configuration + @Bean
-
-"I have multiple implementations and one should be the default."
-
-Use:
-
-@Primary
-
-"I have multiple implementations and need an exact one here."
-
-Use:
-
-@Qualifier
-
-"Configuration should decide whether a Bean exists."
-
-Use:
-
-@ConditionalOnProperty
-
-"Something should execute automatically after startup."
-
-Use:
-
-CommandLineRunner
-
-"I need an HTTP API endpoint."
-
-Use:
+Controller
 
 @RestController
-+
-@GetMapping / @PostMapping / ...
+public class OrderController {
 
-4️⃣4️⃣ Common Beginner Doubts
+    private final OrderService orderService;
 
-Doubt 1: "Why don't I see new in Constructor Injection?"
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
-Because you are not manually creating the dependency.
+    @GetMapping("/order")
+    public String order() {
+        return orderService.placeOrder();
+    }
+}
+
+Now the runtime story is:
+
+Application starts
+        ↓
+Read payment.provider=stripe
+        ↓
+Stripe condition matches
+        ↓
+Stripe Bean created
+        ↓
+Razorpay condition does not match
+        ↓
+Razorpay Bean is not created
+        ↓
+OrderService needs PaymentService
+        ↓
+Spring injects StripePaymentService
+        ↓
+OrderController receives OrderService
+        ↓
+Tomcat starts
+        ↓
+GET /order
+        ↓
+OrderController.order()
+        ↓
+OrderService.placeOrder()
+        ↓
+PaymentService.pay()
+        ↓
+"Paid using Stripe"
+
+This is a very useful real-world mental model because several Spring concepts are working together rather than separately.
+
+🧪 30. Common Doubts — Quick Answers
+
+"Why don't I see new in constructor injection?"
+
+Because Spring creates/provides the dependency.
 
 You write:
 
 public OrderService(PaymentService paymentService)
 
-and Spring provides the object.
+instead of:
 
-new
-    → manual creation
+new PaymentService()
 
-constructor parameter
-    → dependency received from Spring
-
-Doubt 2: "Is @Autowired the same thing as Constructor Injection?"
+"Is @Autowired the same as constructor injection?"
 
 No.
 
 Constructor Injection
-    → how dependency is received
+    → dependency comes through constructor
 
 @Autowired
-    → annotation that identifies an injection point
+    → marks an injection point
 
-Doubt 3: "Why does my code work with or without @Autowired?"
+"Why does my code work with or without @Autowired?"
 
-Because there is only one constructor.
+Because your class has one constructor and Spring can normally use it automatically.
 
-Spring can infer that it should use that constructor.
-
-Doubt 4: "Can a class have two constructors?"
+"Can Java have two constructors?"
 
 Yes.
 
-Java allows it.
+The issue is not Java. The issue is which constructor Spring should use to create the Bean.
 
-The issue is that Spring may need help deciding which constructor to use for dependency injection.
-
-Doubt 5: "Does @Autowired create the dependency?"
+"Does @Autowired create the object?"
 
 No.
 
-Spring creates/manages the dependency as a Bean, and @Autowired marks where it should be injected.
+Spring creates/manages the Bean. @Autowired tells Spring where to inject it.
 
-Doubt 6: "Why do I use final?"
+"Why use private final?"
 
 Because a required constructor-injected dependency usually should not be reassigned after construction.
 
-Doubt 7: "Why is @RestController not printing anything?"
+"Why can't I normally use final with field injection?"
 
-Because @RestController does not automatically execute your methods.
+Because field injection happens after object construction, while a final field needs to be initialized as part of construction (or another valid initialization path).
 
-The method needs an HTTP request matching its mapping.
+"Why is @RestController not printing anything?"
 
-Doubt 8: "Why is Tomcat running if I didn't call an endpoint?"
+Because it does not automatically execute methods. A matching HTTP request must arrive.
 
-Because Spring Boot started the web server during application startup.
+"Why is Tomcat running if I did not call an endpoint?"
 
-The server waits for HTTP requests.
+Because the application is configured as a web application. Spring Boot starts the embedded server and waits for requests.
 
-Doubt 9: "Why use @Bean if I can use @Component?"
+"Why use @Bean when I can use @Component?"
 
-Use @Bean when you need explicit object creation/configuration or when the class is outside your control, such as a third-party library.
+Use @Bean when you need explicit/custom creation or when the class is outside your control, such as a third-party library class.
 
-4️⃣5️⃣ Interview-Ready Summary
+"What is the difference between @Primary and @Qualifier?"
 
-IoC
+@Primary
+    → choose the preferred/default Bean
 
-IoC means Spring takes responsibility for creating and managing application objects.
+@Qualifier
+    → explicitly choose the exact Bean
 
-Spring Container
+"What is the difference between @ConditionalOnProperty and @Qualifier?"
 
-The Spring Container creates, manages, wires and controls the lifecycle of Spring Beans.
+@ConditionalOnProperty
+    → decides which Bean should exist
 
-ApplicationContext
+@Qualifier
+    → decides which existing Bean should be injected
 
-ApplicationContext is the commonly used Spring container abstraction that manages Beans and application configuration.
+🧠 31. Practical Decision Guide — What Should I Use?
 
-Bean
+When building a Spring application, think like this:
+
+I have a normal class that Spring should manage
+
+@Component / @Service / @Repository / Controller stereotype
+
+My class needs another required Spring Bean
+
+Constructor Injection
++
+private final
+
+My class has one constructor
+
+@Autowired usually not required
+
+My class has multiple constructors
+
+Use @Autowired to identify the intended injection constructor when needed
+
+I need a dependency that is optional/changeable
+
+Setter Injection can make sense
+
+I need to register a third-party class or custom-created object
+
+@Configuration + @Bean
+
+I have multiple Beans and one should be the default
+
+@Primary
+
+I have multiple Beans and need a specific one
+
+@Qualifier
+
+Configuration should decide which Bean exists
+
+@ConditionalOnProperty
+
+I need something to execute automatically after startup
+
+CommandLineRunner
+
+I need an HTTP REST endpoint
+
+@RestController
++
+@GetMapping / @PostMapping / ...
+
+🎯 32. Interview Cheat Sheet
+
+What is IoC?
+
+IoC means Spring takes responsibility for creating and managing application objects instead of application code directly controlling their creation.
+
+What is a Spring Bean?
 
 A Bean is an object managed by the Spring Container.
 
-Dependency Injection
+What is the ApplicationContext?
 
-Dependency Injection means an object receives its dependencies from Spring instead of creating them itself.
+ApplicationContext is the commonly used Spring container abstraction that manages Beans, configuration, dependency injection, and lifecycle.
 
-Constructor Injection
+What is Dependency Injection?
 
-Constructor Injection supplies dependencies through a class constructor and is generally preferred for required dependencies.
+DI means an object receives its dependencies from Spring instead of creating them itself.
 
-@Autowired
+What is Constructor Injection?
 
-@Autowired marks an injection point. It is usually unnecessary when a class has only one constructor.
+Constructor Injection means required dependencies are supplied through the class constructor.
 
-private final
+Why is Constructor Injection preferred?
 
-private hides the field from outside access, while final prevents the field reference from being reassigned after initialization.
+It makes dependencies explicit, works naturally with final, supports easier testing, and makes required dependencies visible at object creation time.
 
-@Bean
+What is @Autowired?
+
+@Autowired identifies an injection point. With a single constructor, it is usually not required.
+
+What is @Bean?
 
 @Bean registers the object returned by a configuration method as a Spring-managed Bean.
 
-@Configuration
+What is @Configuration?
 
-@Configuration indicates that a class contains Spring configuration, commonly including @Bean methods.
+@Configuration identifies a class that contains Spring configuration, commonly including @Bean definitions.
 
-Auto-Configuration
+What is Auto-Configuration?
 
-Spring Boot automatically configures common infrastructure based on the application's dependencies, configuration and conditions.
+Spring Boot automatically configures common infrastructure based on the application's dependencies, configuration, and conditions.
 
-@ConditionalOnProperty
+What is @ConditionalOnProperty?
 
-It conditionally registers a Bean based on a configuration property value.
+It conditionally registers a Bean based on the value of a configuration property.
 
-@Primary
+What is @Primary?
 
-It marks a preferred Bean when multiple matching Beans exist.
+It marks a preferred Bean when multiple Beans match a dependency.
 
-@Qualifier
+What is @Qualifier?
 
-It identifies the specific Bean to inject when multiple matching candidates exist.
+It identifies a specific Bean to inject when multiple candidates exist.
 
-CommandLineRunner
+What is CommandLineRunner?
 
 It executes custom code automatically after Spring Boot startup.
 
-@RestController
+What is @RestController?
 
 It identifies a Spring-managed REST controller whose mapped methods can handle HTTP requests.
 
-4️⃣6️⃣ Final Mental Model
+🗺️ 33. Final Mental Model
 
-Keep this flow in your head:
+Keep this single picture in your head:
 
-                 SPRING BOOT
-                      │
-                      ↓
-           SpringApplication.run()
-                      │
-                      ↓
-            ApplicationContext
-             / Spring Container
-                      │
-                      ↓
-                     IoC
-                      │
-                      ↓
-             Spring manages Beans
-                      │
-          ┌───────────┴───────────┐
-          ↓                       ↓
-     Component Scan        Auto-Configuration
-          │                       │
-          ↓                       ↓
-        Beans              Infrastructure setup
-          │
-          ↓
-   Dependency Injection
-          │
-     ┌────┴───────────┐
-     ↓                ↓
-Constructor        @Autowired
+                         SPRING BOOT
+                              │
+                              ↓
+                  SpringApplication.run()
+                              │
+                              ↓
+                ApplicationContext
+                 / Spring Container
+                              │
+                              ↓
+                             IoC
+                              │
+                              ↓
+                    Spring manages Beans
+                              │
+               ┌──────────────┴──────────────┐
+               ↓                             ↓
+       Component Scanning             Auto-Configuration
+               │                             │
+               ↓                             ↓
+             Beans                    Infrastructure setup
+               │
+               ↓
+     Dependency Injection
+               │
+        ┌──────┴─────────┐
+        ↓                ↓
+Constructor          @Autowired
 Injection
-     │
-     ↓
-private final
-     │
-     ↓
+        │
+        ↓
+  private final
+        │
+        ↓
 Application objects wired together
-     │
-     ↓
-Embedded Web Server
-     │
-     ↓
-CommandLineRunner
-     │
-     ↓
-Application Ready
-     │
-     ↓
-HTTP Request
-     │
-     ↓
-@RestController
-     │
-     ↓
-Service
-     │
-     ↓
-Repository / Database / Other Systems
+        │
+        ↓
+   Conditional Beans
+ (@ConditionalOnProperty)
+        │
+        ↓
+ @Primary / @Qualifier
+        │
+        ↓
+ Embedded Web Server
+        │
+        ↓
+ CommandLineRunner
+        │
+        ↓
+ Application Ready
+        │
+        ↓
+ HTTP Request
+        │
+        ↓
+ @RestController
+        │
+        ↓
+      Service
+        │
+        ↓
+ Repository / Database / Other systems
 
-4️⃣7️⃣ Core Rules to Memorize
-
-1. IoC
-   → Spring controls object creation and management.
-
-2. Bean
-   → Object managed by Spring.
-
-3. ApplicationContext
-   → Central Spring container abstraction.
-
-4. DI
-   → Spring provides dependencies to objects.
-
-5. Constructor Injection
-   → Dependency comes through constructor.
-
-6. Required dependency
-   → Prefer Constructor Injection.
-
-7. Constructor Injection
-   → Usually use private final fields.
-
-8. One constructor
-   → @Autowired usually not required.
-
-9. Multiple constructors
-   → @Autowired can identify the constructor Spring should use.
-
-10. @Autowired
-    → Marks an injection point; it does not create the dependency.
-
-11. @Component / @Service
-    → Let Spring discover/manage application classes.
-
-12. @Bean
-    → Explicitly register a created/configured object.
-
-13. @Configuration
-    → Holds Spring configuration and commonly @Bean methods.
-
-14. @Primary
-    → Preferred Bean when multiple candidates exist.
-
-15. @Qualifier
-    → Exact Bean selection.
-
-16. @ConditionalOnProperty
-    → Configuration controls whether a Bean exists.
-
-17. CommandLineRunner
-    → Runs startup code after Spring startup.
-
-18. @RestController
-    → REST controller; methods run when matching HTTP requests arrive.
-
-19. Auto-Configuration
-    → Spring Boot automatically configures common infrastructure.
-
-20. `new`
-    → Manual object creation; avoid manually creating Spring-managed dependencies when DI should provide them.
-
-4️⃣8️⃣ One-Line Memory Map
+✅ 34. Core Rules to Remember
 
 IoC
-→ Spring takes control
+→ Spring controls object creation and management.
 
-Container
-→ Spring manages objects
+ApplicationContext
+→ Central Spring container abstraction.
 
 Bean
-→ Object managed by Spring
+→ Object managed by Spring.
 
 DI
-→ Spring provides objects
+→ Spring provides dependencies to objects.
 
 Constructor Injection
-→ Dependency comes through constructor
+→ Dependency comes through constructor.
 
-private final
-→ Common way to store required constructor dependencies
+Required dependency
+→ Prefer Constructor Injection.
+
+Constructor Injection
+→ Usually store required dependencies as private final.
+
+One constructor
+→ @Autowired usually not required.
+
+Multiple constructors
+→ @Autowired can identify the injection constructor.
 
 @Autowired
-→ Explicit injection point
+→ Marks an injection point; it does not create the dependency.
+
+@Component / @Service
+→ Spring discovers and manages application classes.
 
 @Bean
-→ Manually create + register object as Bean
+→ Explicitly register a created/configured object.
 
-@ConditionalOnProperty
-→ Configuration decides whether Bean exists
+@Configuration
+→ Contains Spring configuration, commonly @Bean methods.
 
 @Primary
-→ Preferred Bean
+→ Preferred Bean when multiple candidates exist.
 
 @Qualifier
-→ Exact Bean
+→ Exact Bean selection.
+
+@ConditionalOnProperty
+→ Configuration controls whether a Bean exists.
 
 CommandLineRunner
-→ Run code after startup
+→ Runs custom code after startup.
 
 @RestController
-→ Handle REST requests
+→ Handles REST requests through mapped endpoint methods.
 
 Auto-Configuration
-→ Spring Boot sets up common infrastructure automatically
+→ Spring Boot automatically configures common infrastructure.
 
-These concepts form the core Spring Boot foundation. Once these are clear, topics such as bean scopes, bean lifecycle, configuration properties, profiles, Spring MVC, JPA, security, and transactions become much easier to understand.
+new
+→ Manual object creation; avoid manually creating Spring-managed dependencies when DI should provide them.
+
+One-line memory:
+Spring Boot starts the application → Spring manages Beans → DI wires them together → Auto-Configuration sets up infrastructure → startup callbacks run → the application becomes ready to serve requests.
